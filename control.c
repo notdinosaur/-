@@ -33,7 +33,7 @@ float PR_calc(PR *pr,float target,float actual)
     error = pr->target - pr->actual;
     pr->vi = error;
 
-    /*y[n]+A1[n-1]+A2[n-2]=B0x[n]+B1x[n-1]+B2[n-2]由Z域传函离散化得到差分方程*/
+    /*y[n]+A1y[n-1]+A2y[n-2]=B0x[n]+B1x[n-1]+B2x[n-2]由Z域传函离散化得到差分方程*/
     pr->vo = -pr->A1 * pr->vo_1 - pr->A2 * pr->vo_2 + pr->B0 * pr->vi + pr->B1 * pr->vi_1+ pr->B2 * pr->vi_2;
 
     /*误差传递*/
@@ -47,16 +47,65 @@ float PR_calc(PR *pr,float target,float actual)
 
 
 
-void SOGI(void) // 广义二重积分正交变换
+void SOGI_init(SOGI *sg,float k,float w,float Ts) // 基于广义二重积分的正交变换
+{
+     float x = 0;
+     float y = 0;
+
+     x = 2 * sg->k * sg->w *sg->Ts;
+     y = sg->w * sg->w * sg->Ts * sg->Ts;
+
+
+     sg->B0 = x/(x+y+4);
+     sg->B1 = -1*sg->B0;
+     sg->A1 = 2*(4-y);
+     sg->A2 = x-y-4/(x+y+4);
+     sg->QB0 = k*y/(x+y+4);
+     sg->QB1 = 2*sg->QB0;
+     sg->QB2 = sg->QB0;
+	
+
+
+}
+
+float SOGI_D(SOGI *sg，float v)
 {
 
-	diff = (U - integral_2) * k_sogi;
-	integral_2 = integral_2 + w * (diff - integral_3) * T_sogi;
+     sg->vi = v;
+	
+     /*离散化所得差分方程*/
+     sg->vo = sg->A1 * sg->vo_1 + sg->A2 * sg->vo_2 + sg->B0 * sg->vi + sg->B2 * sg->vi_2;
 
-	U1 = integral_2;
-	integral_3 = integral_3 + w * integral_2 * T_sogi;
+     /*误差更迭*/
+     sg->vo_2 = sg->vo_1;
+     sg->vo_1 = sg->vo;
+     sg->vi_2 = sg->vi;
 
-	U2 = integral_3;
+
+     return sg->vo; /*返回与输入相同的D轴值*/
+
+
+
+}
+float SOGI_Q(SOGI *sg,float qv)
+{
+
+     sg->vi = qv;
+	
+     /*离散化所得差分方程*/
+     sg->qvo = sg->A1 * sg->qvo_1 + sg->A2 * sg->qvo_2 + sg->QB0 * sg->vi + sg->QB1 * sg->vi_1 + sg->QB2 * sg->vi_2;
+
+     /*误差更迭*/
+     sg->qvo_2 = sg->qvo_1;
+     sg->qvo_1 = sg->qvo;
+     sg->qvi_2 = sg->qvi_1;
+     sg->qvi_1 = sg->qvi;
+
+
+     return sg->qvo; /*返回滞后90°的Q轴值*/
+
+
+
 
 }
 
