@@ -17,6 +17,14 @@ typedef struct
 
 typedef struct
 {
+    float k;
+    float w;
+    float Ts;
+    float A1,A2,B0,B2,QB0,QB1,QB2;
+    float vo,vo_1,vo_2;
+    float vi,vi_1,vi_2;
+    float qvo,qvo_1,qvo_2;
+    
     
 
 } SOGI;
