@@ -3,7 +3,7 @@
 /**/
 
 
-void PR_init(PR *pr,float Kp,float Kr,float Ts,float wc, float wo)
+void PR_init(PR *pr,float Kp,float Kr,float Ts,float wc, float wo)//Wc调节带宽，一般为0.628f(2*pi*0.1)
 {
     float temp = 0;
 
