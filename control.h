@@ -36,6 +36,7 @@ typedef struct
 
 void PR_init(PR *pr,float Kp,float Kr,float Ts,float wc, float wo,float input);
 float PR_calc(PR *pr,float target,float actual);
+void SOGI_init(SOGI *sg,float k,float w,float Ts);
 
 
 #endif /* CONTROL_H_ */
