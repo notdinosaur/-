@@ -2,7 +2,7 @@
 #include "arm_math.h"
 
 
-void PR_init(PR *pr,float Kp,float Kr,float Ts,float wc, float wo)//Wcµ÷½Ú´ø¿í£¬Ò»°ãÎª0.628f(2*pi*0.1)
+void PR_init(PR *pr,float Kp,float Kr,float Ts,float wc, float wo)//Wcè°ƒèŠ‚å¸¦å®½ï¼Œä¸€èˆ¬ä¸º0.628f(2*pi*0.1)
 {
     float temp = 0;
 
@@ -18,7 +18,7 @@ void PR_init(PR *pr,float Kp,float Kr,float Ts,float wc, float wo)//Wcµ÷½Ú´ø¿í£¬
     pr->B1 = (-8 * pr->Kp / pr->Ts / pr->Ts >Ts / pr->Ts + 2 * pr->Kp * pr->wo * pr->wo) / temp;
     pr->B2 = (4 * pr->Kp / - 4 * pr->wc / pr->Ts * (pr->Kp + pr->Kr)+ pr->Kp * pr->wo * pr->wo) / temp;
     pr->A1 = (-8 / pr->Ts / pr->Ts + 2 * pr->wo * pr->wo) / temp;
-    pr->A2 = (4 / pr->Ts / pr->Ts - 4 * pr->wc / pr->Ts + pr->wo * pr->wo) / temp;/*Bo,B1£¬B2£¬A1£¬A2ÎªZÓòÏÂµÄÏà¹ØÏµÊý*/
+    pr->A2 = (4 / pr->Ts / pr->Ts - 4 * pr->wc / pr->Ts + pr->wo * pr->wo) / temp;/*Bo,B1ï¼ŒB2ï¼ŒA1ï¼ŒA2ä¸ºZåŸŸä¸‹çš„ç›¸å…³ç³»æ•°*/
 
 
 }
@@ -32,10 +32,10 @@ float PR_calc(PR *pr,float target,float actual)
     error = pr->target - pr->actual;
     pr->vi = error;
 
-    /*y[n]+A1y[n-1]+A2y[n-2]=B0x[n]+B1x[n-1]+B2x[n-2]ÓÉZÓò´«º¯ÀëÉ¢»¯µÃµ½²î·Ö·½³Ì*/
+    /*y[n]+A1y[n-1]+A2y[n-2]=B0x[n]+B1x[n-1]+B2x[n-2]ç”±ZåŸŸä¼ å‡½ç¦»æ•£åŒ–å¾—åˆ°å·®åˆ†æ–¹ç¨‹*/
     pr->vo = -pr->A1 * pr->vo_1 - pr->A2 * pr->vo_2 + pr->B0 * pr->vi + pr->B1 * pr->vi_1+ pr->B2 * pr->vi_2;
 
-    /*Îó²î´«µÝ*/
+    /*è¯¯å·®ä¼ é€’*/
     pr->vo_2 = pr->vo_1;
     pr->vo_1 = pr->vo;
     pr->vi_2 = pr->vi_1;
@@ -46,19 +46,19 @@ float PR_calc(PR *pr,float target,float actual)
     // if(pr->vo<-1*100)  pr->vo = -1*100;
 
 
-    return pr->vo;/*·µ»Ø¿ØÖÆÆ÷µÄÊä³öÖµ*/
+    return pr->vo;/*è¿”å›žæŽ§åˆ¶å™¨çš„è¾“å‡ºå€¼*/
 }
 
 
-void SOGI_init(SOGI *sg,float k,float w,float Ts) // »ùÓÚ¹ãÒå¶þÖØ»ý·ÖµÄÕý½»±ä»»
+void SOGI_init(SOGI *sg,float k,float w,float Ts) // åŸºäºŽå¹¿ä¹‰äºŒé‡ç§¯åˆ†çš„æ­£äº¤å˜æ¢
 {
 	
-		 float x = 0;
+     float x = 0;
      float y = 0;
 	
-	   sg->k = k;
-	   sg->w = w;
-	   sg->Ts = Ts;
+     sg->k = k;
+     sg->w = w;
+     sg->Ts = Ts;
      
 
      x = 2.0f * sg->k * sg->w *sg->Ts;       
@@ -79,53 +79,53 @@ void SOGI_Transfer(SOGI *sg,float v)
 
      sg->vi = v;
 	
-     /*ÀëÉ¢»¯ËùµÃ²î·Ö·½³Ì*/
+     /*ç¦»æ•£åŒ–æ‰€å¾—å·®åˆ†æ–¹ç¨‹*/
      sg->vo = sg->A1 * sg->vo_1 + sg->A2 * sg->vo_2 + sg->B0 * sg->vi + sg->B2 * sg->vi_2;
      sg->qvo = sg->A1 * sg->qvo_1 + sg->A2 * sg->qvo_2 + sg->QB0 * sg->vi + sg->QB1 * sg->vi_1 + sg->QB2 * sg->vi_2;
 
 
-     /*Îó²î¸üµü*/
+     /*è¯¯å·®æ›´è¿­*/
      sg->vo_2 = sg->vo_1;
      sg->vo_1 = sg->vo;
      sg->vi_2 = sg->vi;
 	
-		 sg->vo = 2.0f*sg->vo;
+     sg->vo = 2.0f*sg->vo;
 	
-     /*Îó²î¸üµü*/
+     /*è¯¯å·®æ›´è¿­*/
      sg->qvo_2 = sg->qvo_1;
      sg->qvo_1 = sg->qvo;
      sg->qvi_2 = sg->qvi_1;
      sg->qvi_1 = sg->qvi;
 
-		 sg->qvo = 2*sg->qvo;
+     sg->qvo = 2*sg->qvo;
 
 }
 
 void Park_transfer(Transfer *tran,float Ualpha,float Ubeta,float sin,float cos)
 {
-		//²ÎÊý´«µÝ
-		tran->Ualpha = Ualpha;
-		tran->Ubeta = Ubeta;
-		tran->Sin = sin;
-		tran->Cos = cos;
+    //å‚æ•°ä¼ é€’
+    tran->Ualpha = Ualpha;
+    tran->Ubeta = Ubeta;
+    tran->Sin = sin;
+    tran->Cos = cos;
 	
 	
-	  tran->Ud = tran->Cos*tran->Ualpha + tran->Sin*tran->Ubeta;
-		tran->Uq = tran->Cos*tran->Ubeta - tran->Sin*tran->Ualpha;
+    tran->Ud = tran->Cos*tran->Ualpha + tran->Sin*tran->Ubeta;
+    tran->Uq = tran->Cos*tran->Ubeta - tran->Sin*tran->Ualpha;
 	
 	
 }
 
 void Inverse_Park_Transfer(Transfer *tran,float Ud,float Uq,float sin,float cos)
 {
-		//²ÎÊý´«µÝ
-		tran->Ud = Ud;
-		tran->Uq = Uq;
-		tran->Sin = sin;
-		tran->Cos = cos;
-	
-		tran->Ualpha = tran->Ud*tran->Cos - tran->Uq*tran->Sin;
-		tran->Ubeta = tran->Ud*tran->Sin + tran->Uq*tran->Cos;
+	//å‚æ•°ä¼ é€’
+	tran->Ud = Ud;
+	tran->Uq = Uq;
+	tran->Sin = sin;
+	tran->Cos = cos;
+		
+	tran->Ualpha = tran->Ud*tran->Cos - tran->Uq*tran->Sin;
+	tran->Ubeta = tran->Ud*tran->Sin + tran->Uq*tran->Cos;
 	
 	
 }
@@ -145,23 +145,23 @@ void pi_init(PID *pi)
 
 float CurrentPIControl(PID *pi,float Kp,float Ki,float tar,float pre)
 {
-    //²ÎÊý´«µÝ
+    //å‚æ•°ä¼ é€’
     pi->Kp = Kp;
     pi->Ki = Ki;
 
     pi->pre = pre;
     pi->tar = tar;
 
-    //Îó²î¼ÆËã
+    //è¯¯å·®è®¡ç®—
     pi->bias = pi->tar - pi->pre;
 	
-		pi->Integral += pi->bias;
+    pi->Integral += pi->bias;
 	
-    //¼ÆËãPI¿ØÖÆÆ÷µÄÊä³öÖµ
+    //è®¡ç®—PIæŽ§åˆ¶å™¨çš„è¾“å‡ºå€¼
     pi->out = pi->Kp * pi->bias + pi->Ki * pi->Integral;
 
 	
-		if(pi->out>50) pi->out = 50;
+    if(pi->out>50) pi->out = 50;
 
     return pi->out;
 
